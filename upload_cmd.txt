@@ -1,0 +1,1 @@
+python cli.py upload --user aidanvangessel -v "pre-processed.mp4" -t "My video title"
