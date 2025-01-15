@@ -3,6 +3,8 @@ from tiktok_uploader import tiktok, Video
 from tiktok_uploader.basics import eprint
 from tiktok_uploader.Config import Config
 import sys, os
+import combine_images
+
 
 if __name__ == "__main__":
     _ = Config.load("./config.txt")
@@ -65,14 +67,20 @@ if __name__ == "__main__":
             video = video_obj.source_ref
             args.video = video
         else:
-            if not os.path.exists(os.path.join(os.getcwd(), Config.get().videos_dir, args.video)) and args.video:
+            # Special case for all files in vid directory
+            if args.video == '*':
+                print('Collecting all files in image directory...')
+                image_paths = combine_images.get_image_files()
+                combine_images.create_image_video(image_paths) # save to vid dir.
+                args.video = os.path.join(os.getcwd(), Config.get().videos_dir, 'output_video.mp4')
+                
+            elif not os.path.exists(os.path.join(os.getcwd(), Config.get().videos_dir, args.video)) and args.video:
                 print("[-] Video does not exist")
                 print("Video Names Available: ")
                 video_dir = os.path.join(os.getcwd(), Config.get().videos_dir)
                 for name in os.listdir(video_dir):
                     print(f'[-] {name}')
                 sys.exit(1)
-
         tiktok.upload_video(args.users, args.video,  args.title, args.schedule, args.comment, args.duet, args.stitch, args.visibility, args.brandorganic, args.brandcontent, args.ailabel, args.proxy)
 
     elif args.subcommand == "show":

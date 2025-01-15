@@ -1,5 +1,6 @@
 COOKIES_DIR= "./CookiesDir"
 VIDEOS_DIR= "./VideosDirPath"
+IMAGES_DIR= "./ImagesDirPath"
 POST_PROCESSING_VIDEO_PATH= "./VideosDirPath"
 IMAGEMAGICK_FONT= "Arial"
 IMAGEMAGICK_FONT_SIZE= 80

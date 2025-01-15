@@ -5,6 +5,7 @@ class Config:
     _DEFAULT_OPTIONS = {
         "COOKIES_DIR": "./CookiesDir",
         "VIDEOS_DIR": "./VideosDirPath",
+        "IMAGES_DIR": "./ImagesDirPath",
         "POST_PROCESSING_VIDEO_PATH": "./VideosDirPath",
         "IMAGEMAGICK_FONT": "Arial", 
         "IMAGEMAGICK_FONT_SIZE": 80,
@@ -79,6 +80,10 @@ class Config:
     def videos_dir(self):
         """Directory where videos are stored"""
         return self.get_option_by_name("VIDEOS_DIR")
+    @property
+    def images_dir(self):
+        """Directory where images are stored"""
+        return self.get_option_by_name("IMAGES_DIR")
     
     @property
     def post_processing_video_path(self):
