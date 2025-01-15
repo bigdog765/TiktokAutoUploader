@@ -1,3 +1,4 @@
+from urllib.parse import urlencode
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -6,6 +7,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import os
 import re
+import requests
+import random
 
 def extract_string_inside_quotes(text):
     # Regex to extract the string inside quotes
@@ -14,6 +17,41 @@ def extract_string_inside_quotes(text):
     if match:
         return match.group(1)  # Return the content inside the quotes
     return None  # Return None if no match is found
+API_KEY = '618478fe-a490-4bd3-9112-8bdcb94377d2'
+
+def get_scrapeops_url(url):
+    payload = {'api_key': API_KEY, 'url': url}
+    proxy_url = 'https://proxy.scrapeops.io/v1/?' + urlencode(payload)
+    return proxy_url
+
+def download_image(url):
+    # Extract only the file name from the URL
+    file_name = url.split("/")[-1]  # Get the last part of the URL
+    save_path = os.path.join("./ImagesDirPath", file_name)  # Save directly in ImagesDirPath
+
+    # Ensure the ImagesDirPath directory exists
+    os.makedirs("./ImagesDirPath", exist_ok=True)
+
+    url = "https://cdn.midjourney.com/89432824-7165-4628-a2a9-64ff65d4cd2e/0_0_640_N.webp"
+    url = get_scrapeops_url(url)
+    user_agents_list = [
+    'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36'
+    ]
+    headers={'User-Agent': random.choice(user_agents_list)}
+    response = requests.request("GET", url, headers=headers)
+
+    print('Status code:', response.status_code)
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Write the image data to a file
+        with open(save_path, 'wb') as file:
+            for chunk in response.iter_content(1024):  # Write in chunks
+                file.write(chunk)
+        print(f"Image downloaded and saved to {save_path}")
+    else:
+        print(f"Failed to download image. Status code: {response.status_code} {response.reason} {response.text}")
 
 # Configure Chrome options
 options = Options()
@@ -43,7 +81,8 @@ background_image_elements = [img.get_attribute("style").split(';')[1] for img in
 matches = [str(re.findall(pattern, elem)) for elem in background_image_elements]
 # Print the extracted URLs
 url_result = [extract_string_inside_quotes(match) for match in matches]
-print(url_result)
+print(url_result[:5])
+[download_image(url) for url in url_result[:3]]
 
 # Quit the driver
 driver.quit()
