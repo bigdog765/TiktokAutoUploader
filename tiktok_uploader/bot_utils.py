@@ -7,6 +7,7 @@ user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 
 def subprocess_jsvmp(js, user_agent, url):
 	proc = subprocess.Popen(['node', js, url, user_agent], stdout=subprocess.PIPE)
+	print('Waiting for the signature subprocess to finish...')
 	return proc.stdout.read().decode('utf-8')
 
 
