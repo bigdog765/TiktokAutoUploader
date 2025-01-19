@@ -32,7 +32,7 @@ def download_image(url):
     # Ensure the ImagesDirPath directory exists
     os.makedirs("./ImagesDirPath", exist_ok=True)
 
-    url = "https://cdn.midjourney.com/89432824-7165-4628-a2a9-64ff65d4cd2e/0_0_640_N.webp"
+    #url = "https://cdn.midjourney.com/89432824-7165-4628-a2a9-64ff65d4cd2e/0_0_640_N.webp"
     url = get_scrapeops_url(url)
     user_agents_list = [
     'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148',
@@ -82,6 +82,7 @@ matches = [str(re.findall(pattern, elem)) for elem in background_image_elements]
 # Print the extracted URLs
 url_result = [extract_string_inside_quotes(match) for match in matches]
 print(url_result[:5])
+#driver.get(url_result[0])
 [download_image(url) for url in url_result[:3]]
 
 # Quit the driver
