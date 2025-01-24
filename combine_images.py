@@ -15,11 +15,13 @@ def get_image_files():
         print('List:', image_list)
         return image_list
         
-
+def remove_images(image_paths):
+    for image_path in image_paths:
+        os.remove(image_path)
 # Function to create a flipping effect
 def create_clip(image_path, duration=2):
     # Open and resize the image
-    image = Image.open(image_path).resize((1080, 1920))
+    image = Image.open(image_path).resize((1080, 1350))
     
     # Convert the PIL image to a NumPy array
     image_array = np.array(image)
@@ -33,8 +35,10 @@ def create_image_video(image_paths):
     # Concatenate all the clips into a single video
     concat_clips = concatenate_videoclips(clips)
     # Resize to 1080x1920
-    resized_clip = concat_clips.resized(width=1080, height=1920)
+    resized_clip = concat_clips.resized(width=1080, height=1350) # 4:5 aspect ratio
 
     # Save the resulting video
     resized_clip.write_videofile("./VideosDirPath/output_video.mp4", fps=24)
+    # delete all images in image directory
+    remove_images(image_paths)
 

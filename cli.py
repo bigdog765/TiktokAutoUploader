@@ -4,6 +4,7 @@ from tiktok_uploader.basics import eprint
 from tiktok_uploader.Config import Config
 import sys, os
 import combine_images
+import webscrape.webscrape as webscraper
 
 
 if __name__ == "__main__":
@@ -69,9 +70,12 @@ if __name__ == "__main__":
         else:
             # Special case for all files in vid directory
             if args.video == '*':
+                # execute webscraper script to get midjourney images
+                webscraper.execute()
                 print('Collecting all files in image directory...')
                 image_paths = combine_images.get_image_files()
                 combine_images.create_image_video(image_paths) # save to vid dir.
+                
                 args.video = os.path.join(os.getcwd(), Config.get().videos_dir, 'output_video.mp4')
                 
             elif not os.path.exists(os.path.join(os.getcwd(), Config.get().videos_dir, args.video)) and args.video:

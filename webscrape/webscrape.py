@@ -9,7 +9,10 @@ import os
 import re
 import requests
 import random
+import threading
+import secrets
 
+threads = []
 def extract_string_inside_quotes(text):
     # Regex to extract the string inside quotes
     pattern = r'"([^"]+)"'
@@ -27,12 +30,13 @@ def get_scrapeops_url(url):
 def download_image(url):
     # Extract only the file name from the URL
     file_name = url.split("/")[-1]  # Get the last part of the URL
-    save_path = os.path.join("./ImagesDirPath", file_name)  # Save directly in ImagesDirPath
+
+    random_prefix = secrets.token_hex(4)
+    save_path = os.path.join("./ImagesDirPath", random_prefix + file_name)  # Save directly in ImagesDirPath
 
     # Ensure the ImagesDirPath directory exists
     os.makedirs("./ImagesDirPath", exist_ok=True)
 
-    #url = "https://cdn.midjourney.com/89432824-7165-4628-a2a9-64ff65d4cd2e/0_0_640_N.webp"
     url = get_scrapeops_url(url)
     user_agents_list = [
     'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148',
@@ -52,38 +56,42 @@ def download_image(url):
         print(f"Image downloaded and saved to {save_path}")
     else:
         print(f"Failed to download image. Status code: {response.status_code} {response.reason} {response.text}")
+def execute():
+    print('Webscraping started...')
+    # Configure Chrome options
+    options = Options()
+    #options.add_argument("--disable-gpu")  # Disable GPU acceleration
+    #options.add_argument("--headless")  # Run in headless mode (no GUI)
 
-# Configure Chrome options
-options = Options()
-#options.add_argument("--disable-gpu")  # Disable GPU acceleration
-#options.add_argument("--headless")  # Run in headless mode (no GUI)
+    # Set up the driver with the absolute path to the ChromeDriver
+    chrome_driver_path = os.path.abspath("./webscrape/chromedriver-win64/chromedriver.exe")  # Replace with your chromedriver path
+    service = Service(chrome_driver_path)
+    driver = webdriver.Chrome(service=service, options=options)
 
-# Set up the driver with the absolute path to the ChromeDriver
-chrome_driver_path = os.path.abspath("./webscrape/chromedriver-win64/chromedriver.exe")  # Replace with your chromedriver path
-service = Service(chrome_driver_path)
-driver = webdriver.Chrome(service=service, options=options)
+    # Load the website
+    driver.get("https://www.midjourney.com/explore?tab=hot")
 
-# Load the website
-driver.get("https://www.midjourney.com/explore?tab=hot")
+    wait = WebDriverWait(driver, 10)
+    wait.until(EC.presence_of_all_elements_located(
+        (By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')))
 
-wait = WebDriverWait(driver, 10)
-wait.until(EC.presence_of_all_elements_located(
-    (By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')))
+    # Extract image URLs (modify the XPath based on the page structure)
+    image_elements = driver.find_elements(
+        By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')
 
-# Extract image URLs (modify the XPath based on the page structure)
-image_elements = driver.find_elements(
-    By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')
+    # Regex pattern
+    pattern = r'"[^"]*"\)\s*2x\)' # Extract the URL inside the background-image URL with 2x resolution
 
-# Regex pattern
-pattern = r'"[^"]*"\)\s*2x\)' # Extract the URL inside the background-image URL with 2x resolution
-
-background_image_elements = [img.get_attribute("style").split(';')[1] for img in image_elements]
-matches = [str(re.findall(pattern, elem)) for elem in background_image_elements]
-# Print the extracted URLs
-url_result = [extract_string_inside_quotes(match) for match in matches]
-print(url_result[:5])
-#driver.get(url_result[0])
-[download_image(url) for url in url_result[:3]]
-
-# Quit the driver
-driver.quit()
+    background_image_elements = [img.get_attribute("style").split(';')[1] for img in image_elements]
+    matches = [str(re.findall(pattern, elem)) for elem in background_image_elements]
+    # Print the extracted URLs
+    url_result = [extract_string_inside_quotes(match) for match in matches]
+    print(url_result[:5])
+    
+    for url in url_result[:5]:
+        thr = threading.Thread(target=download_image, args=(url,))
+        thr.start()
+        threads.append(thr)
+    [t.join() for t in threads]
+    # Quit the driver
+    driver.quit()
