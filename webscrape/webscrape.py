@@ -11,8 +11,11 @@ import requests
 import random
 import threading
 import secrets
+import time
 
 threads = []
+success_ctr = 0
+amount_of_images = 5
 def extract_string_inside_quotes(text):
     # Regex to extract the string inside quotes
     pattern = r'"([^"]+)"'
@@ -28,6 +31,7 @@ def get_scrapeops_url(url):
     return proxy_url
 
 def download_image(url):
+    global success_ctr
     # Extract only the file name from the URL
     file_name = url.split("/")[-1]  # Get the last part of the URL
 
@@ -54,6 +58,7 @@ def download_image(url):
             for chunk in response.iter_content(1024):  # Write in chunks
                 file.write(chunk)
         print(f"Image downloaded and saved to {save_path}")
+        success_ctr+=1
     else:
         print(f"Failed to download image. Status code: {response.status_code} {response.reason} {response.text}")
 def execute():
@@ -86,12 +91,12 @@ def execute():
     matches = [str(re.findall(pattern, elem)) for elem in background_image_elements]
     # Print the extracted URLs
     url_result = [extract_string_inside_quotes(match) for match in matches]
-    print(url_result[:5])
     
-    for url in url_result[:5]:
+    for url in url_result[:amount_of_images]:
         thr = threading.Thread(target=download_image, args=(url,))
         thr.start()
         threads.append(thr)
+        time.sleep(2)
     [t.join() for t in threads]
     # Quit the driver
     driver.quit()
