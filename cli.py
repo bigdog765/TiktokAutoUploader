@@ -7,6 +7,17 @@ import combine_images
 import webscrape.webscrape as webscraper
 
 
+def ovveride_star_cmd():
+    # execute webscraper script to get midjourney images
+    print('Starting * command...')
+    webscraper.execute()
+    print('Collecting all files in image directory...')
+    image_paths = combine_images.get_image_files()
+    combine_images.create_image_video(image_paths) # save to vid dir.
+    
+    args.video = os.path.join(os.getcwd(), Config.get().videos_dir, 'output_video.mp4')
+    tiktok.upload_video(args.users, args.video,  args.title, args.schedule, args.comment, args.duet, args.stitch, args.visibility, args.brandorganic, args.brandcontent, args.ailabel, args.proxy)
+
 if __name__ == "__main__":
     _ = Config.load("./config.txt")
     # print(Config.get().cookies_dir)

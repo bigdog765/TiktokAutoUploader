@@ -1,15 +1,15 @@
 import os
 
 from flask import Flask
+from cli import ovveride_star_cmd
 
 app = Flask(__name__)
 
 
 @app.route("/")
 def hello_world():
-    """Example Hello World route."""
-    name = os.environ.get("NAME", "World")
-    return f"Hello {name}!"
+    print("Hello World")
+    ovveride_star_cmd()
 
 
 if __name__ == "__main__":
