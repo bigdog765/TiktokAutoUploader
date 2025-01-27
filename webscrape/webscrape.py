@@ -69,7 +69,7 @@ def execute():
     #options.add_argument("--headless")  # Run in headless mode (no GUI)
 
     # Set up the driver with the absolute path to the ChromeDriver
-    chrome_driver_path = os.path.abspath("./webscrape/chromedriver-win64/chromedriver.exe")  # Replace with your chromedriver path
+    chrome_driver_path = os.path.abspath("./webscrape/chromedriver-linux64/chromedriver")  # Replace with your chromedriver path
     service = Service(chrome_driver_path)
     driver = webdriver.Chrome(service=service, options=options)
 

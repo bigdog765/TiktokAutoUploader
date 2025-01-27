@@ -1,3 +1,3 @@
-python cli.py upload --user aidanvangessel -v "pre-processed.mp4" -t "My video title"
+python cli.py upload --user aidanvangessel -v * -t "My video title"
 gcloud run jobs deploy daily-tiktok-upload --source . --tasks 5 --set-env-vars SLEEP_MS=10000,FAIL_RATE=0.1 --max-retries 2 --region us-central1 --project=dazzling-lodge-448921-n8
 gcloud run deploy --source .
