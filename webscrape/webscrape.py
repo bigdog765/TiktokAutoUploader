@@ -68,12 +68,7 @@ def execute():
     options = Options()
     options.add_argument("--disable-gpu")  # Disable GPU acceleration
     #options.add_argument("--headless")  # Run in headless mode (no GUI)
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
 
-    # Create a unique temporary directory for user data
-    user_data_dir = tempfile.mkdtemp()
-    options.add_argument(f"--user-data-dir={user_data_dir}")
     # Set up the driver with the absolute path to the ChromeDriver
     print("heyyyy")
     chrome_driver_path = os.path.abspath("./webscrape/chromedriver-linux64/chromedriver")  # Replace with your chromedriver path

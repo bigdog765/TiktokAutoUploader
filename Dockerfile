@@ -63,4 +63,5 @@ EXPOSE 8000
 # Run the application.
 # Run Flask in debug mode
 ENV FLASK_APP=main.py
-CMD ["flask", "run", "--host=0.0.0.0", "--port=8000", "--debug"]
+# Run the application directly with Python
+CMD ["python", "main.py"]
