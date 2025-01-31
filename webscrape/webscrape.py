@@ -5,6 +5,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from webdriver_manager.chrome import ChromeDriverManager
 import os
 import re
 import requests
@@ -65,17 +67,23 @@ def download_image(url):
 def execute():
     print('Webscraping started...')
     # Configure Chrome options
-    options = Options()
-    options.add_argument("--disable-gpu")  # Disable GPU acceleration
+    # options = Options()
+    # options.add_argument("--disable-gpu")  # Disable GPU acceleration
     #options.add_argument("--headless")  # Run in headless mode (no GUI)
 
     # Set up the driver with the absolute path to the ChromeDriver
     print("heyyyy")
-    chrome_driver_path = os.path.abspath("./webscrape/chromedriver-linux64/chromedriver")  # Replace with your chromedriver path
-    print(chrome_driver_path)
-    service = Service(chrome_driver_path)
-    driver = webdriver.Chrome(service=service, options=options)
-
+    # chrome_driver_path = os.path.abspath("./webscrape/chromedriver-linux64/chromedriver")  # Replace with your chromedriver path
+    # print(chrome_driver_path)
+    # service = Service(chrome_driver_path)
+    # driver = webdriver.Chrome(service=service, options=options)
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--window-size=1920,1080')
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--disable-gpu')
+    driver = webdriver.Chrome(options=chrome_options)
+    
     # Load the website
     driver.get("https://www.midjourney.com/explore?tab=hot")
 

@@ -17,17 +17,31 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Install git, build tools, and wget
+# Install git, build tools, wget, and curl
 RUN apt-get update && apt-get install -y \
     git \
     build-essential \
     wget \
-    gnupg
+    gnupg \
+    curl \
+    unzip
 
-# Install Google Chrome
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable
+ARG CHROME_VERSION=114.0.5735.198-1
+RUN wget -q https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb
+RUN apt-get -y update
+RUN apt-get install -y ./google-chrome-stable_${CHROME_VERSION}_amd64.deb
+
+# Install ChromeDriver
+RUN CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1,2) \
+    && echo "Detected Chrome version: $CHROME_VERSION" \
+    && CHROMEDRIVER_VERSION=114.0.5735.90 \
+    && echo "Detected ChromeDriver version: $CHROMEDRIVER_VERSION" \
+    && wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip \
+    && unzip /tmp/chromedriver.zip -d /usr/local/bin/ \
+    && rm /tmp/chromedriver.zip
+
+# set display port to avoid crash
+ENV DISPLAY=:99
 
 WORKDIR /app
 
