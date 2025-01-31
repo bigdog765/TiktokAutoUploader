@@ -6,7 +6,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from webdriver_manager.chrome import ChromeDriverManager
+
 import os
 import re
 import requests
@@ -69,10 +69,10 @@ def execute():
     # Configure Chrome options
     # options = Options()
     # options.add_argument("--disable-gpu")  # Disable GPU acceleration
-    #options.add_argument("--headless")  # Run in headless mode (no GUI)
+    # options.add_argument("--headless")  # Run in headless mode (no GUI)
 
     # Set up the driver with the absolute path to the ChromeDriver
-    print("heyyyy")
+    # print("heyyyy")
     # chrome_driver_path = os.path.abspath("./webscrape/chromedriver-linux64/chromedriver")  # Replace with your chromedriver path
     # print(chrome_driver_path)
     # service = Service(chrome_driver_path)
