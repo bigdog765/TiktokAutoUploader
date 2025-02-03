@@ -26,19 +26,32 @@ RUN apt-get update && apt-get install -y \
     curl \
     unzip
 
-ARG CHROME_VERSION=114.0.5735.198-1
-RUN wget -q https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb
-RUN apt-get -y update
-RUN apt-get install -y ./google-chrome-stable_${CHROME_VERSION}_amd64.deb
+#####################################
+# Download and install Chrome for Testing
+#####################################
 
-# Install ChromeDriver
-RUN CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1,2) \
-    && echo "Detected Chrome version: $CHROME_VERSION" \
-    && CHROMEDRIVER_VERSION=114.0.5735.90 \
-    && echo "Detected ChromeDriver version: $CHROMEDRIVER_VERSION" \
-    && wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip \
-    && unzip /tmp/chromedriver.zip -d /usr/local/bin/ \
-    && rm /tmp/chromedriver.zip
+# Download the Chrome zip from the provided endpoint.
+RUN wget -O /tmp/chrome-linux64.zip "https://storage.googleapis.com/chrome-for-testing-public/132.0.6834.159/linux64/chrome-linux64.zip" && \
+    unzip /tmp/chrome-linux64.zip -d /opt && \
+    rm /tmp/chrome-linux64.zip
+
+# The zip extracts to /opt/chrome-linux64.
+# Optionally, create a symlink so that the chrome binary is available as "chrome".
+RUN ln -s /opt/chrome-linux64/chrome /usr/bin/chrome
+
+# Add Chrome's directory to the PATH.
+ENV PATH="/opt/chrome-linux64:${PATH}"
+
+#####################################
+# Download and install ChromeDriver
+#####################################
+
+# Download the ChromeDriver zip from the provided endpoint.
+RUN wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip" && \
+    unzip /tmp/chromedriver.zip -d /usr/local/bin && \
+    rm /tmp/chromedriver.zip && \
+    chmod +x /usr/local/bin/chromedriver
+
 
 # set display port to avoid crash
 ENV DISPLAY=:99
