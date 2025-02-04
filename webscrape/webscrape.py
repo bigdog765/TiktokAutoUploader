@@ -80,7 +80,7 @@ def execute():
     print("uhhh")
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--headless') # prevents DevToolsActivePort file doesn't exist error?
     chrome_options.add_argument('--disable-dev-shm-usage')
 
     # Explicitly point to the chromedriver executable

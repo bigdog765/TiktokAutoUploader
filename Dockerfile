@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y \
 #####################################
 
 # Download the Chrome zip from the provided endpoint.
-RUN wget -O /tmp/chrome-linux64.zip "https://storage.googleapis.com/chrome-for-testing-public/132.0.6834.159/linux64/chrome-linux64.zip" && \
+RUN wget -O /tmp/chrome-linux64.zip "https://storage.googleapis.com/chrome-for-testing-public/114.0.5735.90/linux64/chrome-linux64.zip" && \
     unzip /tmp/chrome-linux64.zip -d /opt && \
     rm /tmp/chrome-linux64.zip
 
