@@ -37,7 +37,7 @@ RUN wget -O /tmp/chrome-linux64.zip "https://storage.googleapis.com/chrome-for-t
 
 # The zip extracts to /opt/chrome-linux64.
 # Optionally, create a symlink so that the chrome binary is available as "chrome".
-RUN ln -s /opt/chrome-linux64/chrome /usr/bin/chrome
+RUN ln -s /opt/chrome-linux64/chrome /usr/bin/google-chrome
 
 # Add Chrome's directory to the PATH.
 ENV PATH="/opt/chrome-linux64:${PATH}"
@@ -78,9 +78,32 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install -r requirements.txt
 
+
+
+RUN apt-get install -y libglib2.0-0 \
+    libnss3 \
+    libnspr4 \
+    libdbus-1-3 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libglib2.0-0 \
+    libcups2 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libxkbcommon0 \
+    libpango-1.0-0 \
+    libcairo2 \
+    libasound2 
+RUN ldd /usr/local/bin/chromedriver
+RUN ldd /usr/bin/google-chrome
+
 # Switch to the non-privileged user to run the application.
 USER appuser
 
+RUN google-chrome --version
 # Copy the source code into the container.
 COPY . .
 
