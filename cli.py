@@ -7,7 +7,7 @@ import combine_images
 import webscrape.webscrape as webscraper
 
 
-def ovveride_star_cmd(in_docker=False):
+def ovveride_star_cmd(in_docker=True):
     # execute webscraper script to get midjourney images
     print('Starting * command...')
     webscraper.execute(in_docker)
@@ -82,7 +82,11 @@ if __name__ == "__main__":
             # Special case for all files in vid directory
             if args.video == '*':
                 # execute webscraper script to get midjourney images
-                webscraper.execute()
+                try:
+                    webscraper.execute()
+                except Exception as e:
+                    print("Error executing webscraper script:", e)
+                    sys.exit(1)
                 print('Collecting all files in image directory...')
                 image_paths = combine_images.get_image_files()
                 combine_images.create_image_video(image_paths) # save to vid dir.

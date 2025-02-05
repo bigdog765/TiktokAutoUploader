@@ -69,7 +69,7 @@ def execute(in_docker=False):
     
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--headless') # prevents DevToolsActivePort file doesn't exist error?
+    #chrome_options.add_argument('--headless') # prevents DevToolsActivePort file doesn't exist error?
     chrome_options.add_argument('--disable-dev-shm-usage')
     if in_docker:
         # Explicitly point to a linux chromedriver executable
@@ -102,11 +102,13 @@ def execute(in_docker=False):
     # driver.switch_to.frame(iframe)
 
     try:
+        print("Waiting for the element to be located")
         wait.until(EC.presence_of_all_elements_located(
             (By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')))
         print("Element found")
     except Exception as e:
         print("Element not found")
+        raise e
     # Extract image URLs (modify the XPath based on the page structure)
     image_elements = driver.find_elements(
         By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')
