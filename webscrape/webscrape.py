@@ -64,29 +64,22 @@ def download_image(url):
         success_ctr+=1
     else:
         print(f"Failed to download image. Status code: {response.status_code} {response.reason} {response.text}")
-def execute():
+def execute(in_docker=False):
     print('Webscraping started...')
-    # Configure Chrome options
-    # options = Options()
-    # options.add_argument("--disable-gpu")  # Disable GPU acceleration
-    # options.add_argument("--headless")  # Run in headless mode (no GUI)
-
-    # Set up the driver with the absolute path to the ChromeDriver
-    print("heyyyy")
-    # chrome_driver_path = os.path.abspath("./webscrape/chromedriver-linux64/chromedriver")  # Replace with your chromedriver path
-    # print(chrome_driver_path)
-    # service = Service(chrome_driver_path)
-    # driver = webdriver.Chrome(service=service, options=options)
-    print("uhhh")
+    
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--headless') # prevents DevToolsActivePort file doesn't exist error?
     chrome_options.add_argument('--disable-dev-shm-usage')
-
-    # Explicitly point to the chromedriver executable
-    service = Service('/usr/local/bin/chromedriver')
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-    
+    if in_docker:
+        # Explicitly point to a linux chromedriver executable
+        service = Service('/usr/local/bin/chromedriver')
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+    else:
+        chrome_driver_path = os.path.abspath("./webscrape/chromedriver-win64/chromedriver.exe")  # Replace with your chromedriver path
+        print(chrome_driver_path)
+        service = Service(chrome_driver_path)
+        driver = webdriver.Chrome(service=service, options=chrome_options)
     # Load the website
     driver.get("https://www.midjourney.com/explore?tab=hot")
 
@@ -101,7 +94,7 @@ def execute():
     print(driver.page_source)
 
     # Increase the wait time
-    wait = WebDriverWait(driver, 20)
+    wait = WebDriverWait(driver, 10)
 
     # Check for iframes and switch to it if necessary
     # Uncomment and modify the following lines if the element is inside an iframe

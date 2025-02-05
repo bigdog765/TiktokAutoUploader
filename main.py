@@ -9,7 +9,7 @@ app = Flask(__name__)
 @app.route("/")
 def hello_world():
     print("Hello World")
-    ovveride_star_cmd()
+    ovveride_star_cmd(True)
 
 
 if __name__ == "__main__":
