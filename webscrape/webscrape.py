@@ -90,10 +90,30 @@ def execute():
     # Load the website
     driver.get("https://www.midjourney.com/explore?tab=hot")
 
-    wait = WebDriverWait(driver, 10)
-    wait.until(EC.presence_of_all_elements_located(
-        (By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')))
+    # Check the page title to confirm the page has loaded
+    # Print various details to confirm the page has loaded
+    print("Page title:", driver.title)
+    print("Current URL:", driver.current_url)
+    print("Page source length:", len(driver.page_source))
+    print("Cookies:", driver.get_cookies())
 
+    # Print the page source to verify the element is present
+    print(driver.page_source)
+
+    # Increase the wait time
+    wait = WebDriverWait(driver, 20)
+
+    # Check for iframes and switch to it if necessary
+    # Uncomment and modify the following lines if the element is inside an iframe
+    # iframe = driver.find_element(By.XPATH, '//iframe')
+    # driver.switch_to.frame(iframe)
+
+    try:
+        wait.until(EC.presence_of_all_elements_located(
+            (By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')))
+        print("Element found")
+    except Exception as e:
+        print("Element not found")
     # Extract image URLs (modify the XPath based on the page structure)
     image_elements = driver.find_elements(
         By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')
