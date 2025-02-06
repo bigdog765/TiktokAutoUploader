@@ -91,15 +91,10 @@ def execute(in_docker=False):
     print("Cookies:", driver.get_cookies())
 
     # Print the page source to verify the element is present
-    print(driver.page_source)
+    print(driver.page_source) # recaptcha will be present in the page source if ran in headless mode
 
     # Increase the wait time
     wait = WebDriverWait(driver, 10)
-
-    # Check for iframes and switch to it if necessary
-    # Uncomment and modify the following lines if the element is inside an iframe
-    # iframe = driver.find_element(By.XPATH, '//iframe')
-    # driver.switch_to.frame(iframe)
 
     try:
         print("Waiting for the element to be located")
