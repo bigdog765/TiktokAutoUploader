@@ -3,7 +3,7 @@ from .basics import eprint
 
 class Config:
     _DEFAULT_OPTIONS = {
-        "COOKIES_DIR": "./CookiesDir",
+        "COOKIES_DIR": "CookiesDir",
         "VIDEOS_DIR": "./VideosDirPath",
         "IMAGES_DIR": "./ImagesDirPath",
         "POST_PROCESSING_VIDEO_PATH": "./VideosDirPath",

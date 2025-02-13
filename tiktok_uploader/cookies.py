@@ -11,7 +11,7 @@ def load_cookies_from_file(filename: str, cookies_path=None):
     else:
         cookie_path = os.path.join(cookies_path, filename + ".cookie")
     if not os.path.exists(cookie_path):
-        # eprint(f"Warning: Could not find cookie file at path: {cookie_path} (ignoring)")
+        print(f"Warning: Could not find cookie file at path: {cookie_path} (ignoring)")
         print("User not found on system.")
         return []
     
