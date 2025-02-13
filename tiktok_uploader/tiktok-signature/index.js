@@ -118,7 +118,27 @@ class Signer {
     // generate valid verifyFp
     let verify_fp = Utils.generateVerifyFp();
     let newUrl = link + "&verifyFp=" + verify_fp;
-    let token = await this.page.evaluate(`generateSignature("${newUrl}")`);
+
+
+    const maxRetries = 50;
+    let attempt = 0;
+
+    while (attempt < maxRetries) {
+      try {
+        // Await the promise returned by generateSignatureLoop
+        var token = await this.page.evaluate(`generateSignature("${newUrl}")`);
+        break
+      } catch (error) {
+        attempt++;
+        console.log(`Attempt ${attempt} failed: ${error.message}`);
+        if (attempt >= maxRetries) {
+          throw new Error('Unable to generate signature after maximum retries');
+        }
+        // Wait for 3 seconds before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+    
     let signed_url = newUrl + "&_signature=" + token;
     let queryString = new URL(signed_url).searchParams.toString();
     let bogus = await this.page.evaluate(`generateBogus("${queryString}","${this.userAgent}")`);

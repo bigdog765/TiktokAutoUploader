@@ -6,7 +6,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-
+from webdriver_manager.chrome import ChromeDriverManager
 import os
 import re
 import requests
@@ -67,13 +67,13 @@ def download_image(url):
 def execute(in_docker=False):
     print('Webscraping started...')
     
-    chrome_options = webdriver.ChromeOptions()
+    chrome_options = Options()
     chrome_options.add_argument('--no-sandbox')
     #chrome_options.add_argument('--headless') # prevents DevToolsActivePort file doesn't exist error?
     chrome_options.add_argument('--disable-dev-shm-usage')
     if in_docker:
         # Explicitly point to a linux chromedriver executable
-        service = Service('/usr/local/bin/chromedriver')
+        service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=chrome_options)
     else:
         chrome_driver_path = os.path.abspath("./webscrape/chromedriver-win64/chromedriver.exe")  # Replace with your chromedriver path
@@ -83,15 +83,8 @@ def execute(in_docker=False):
     # Load the website
     driver.get("https://www.midjourney.com/explore?tab=hot")
 
-    # Check the page title to confirm the page has loaded
-    # Print various details to confirm the page has loaded
-    print("Page title:", driver.title)
-    print("Current URL:", driver.current_url)
-    print("Page source length:", len(driver.page_source))
-    print("Cookies:", driver.get_cookies())
-
     # Print the page source to verify the element is present
-    print(driver.page_source) # recaptcha will be present in the page source if ran in headless mode
+    #print(driver.page_source) # recaptcha will be present in the page source if ran in headless mode
 
     # Increase the wait time
     wait = WebDriverWait(driver, 10)

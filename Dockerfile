@@ -1,117 +1,61 @@
-# syntax=docker/dockerfile:1
+FROM selenium/standalone-chrome:131.0
 
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Dockerfile reference guide at
-# https://docs.docker.com/go/dockerfile-reference/
+USER root
 
-# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
-
-ARG PYTHON_VERSION=3.13.1
-FROM python:${PYTHON_VERSION}-slim as base
-
-# Prevents Python from writing pyc files.
-ENV PYTHONDONTWRITEBYTECODE=1
-
-# Keeps Python from buffering stdout and stderr to avoid situations where
-# the application crashes without emitting any logs due to buffering.
-ENV PYTHONUNBUFFERED=1
-
-# Install git, build tools, and wget
-# Install git, build tools, wget, and curl
+# install Python3, pip, venv, Xvfb, and Node.js dependencies
 RUN apt-get update && apt-get install -y \
-    git \
+    python3-pip \
+    python3-venv \
+    xvfb \
     build-essential \
-    wget \
-    gnupg \
-    curl \
-    unzip
+    libffi-dev \
+    python3-dev \
+    curl && \
+    # Install Node.js (here using Node 18.x)
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-#####################################
-# Download and install Chrome for Testing
-#####################################
-
-# Download the Chrome zip from the provided endpoint.
-RUN wget -O /tmp/chrome-linux64.zip "https://storage.googleapis.com/chrome-for-testing-public/114.0.5735.90/linux64/chrome-linux64.zip" && \
-    unzip /tmp/chrome-linux64.zip -d /opt && \
-    rm /tmp/chrome-linux64.zip
-
-# The zip extracts to /opt/chrome-linux64.
-# Optionally, create a symlink so that the chrome binary is available as "chrome".
-RUN ln -s /opt/chrome-linux64/chrome /usr/bin/google-chrome
-
-# Add Chrome's directory to the PATH.
-ENV PATH="/opt/chrome-linux64:${PATH}"
-
-#####################################
-# Download and install ChromeDriver
-#####################################
-
-# Download the ChromeDriver zip from the provided endpoint.
-RUN wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip" && \
-    unzip /tmp/chromedriver.zip -d /usr/local/bin && \
-    rm /tmp/chromedriver.zip && \
-    chmod +x /usr/local/bin/chromedriver
-
-
-# set display port to avoid crash
+# set Python-related environment variables
+ENV PYTHONUNBUFFERED=1
 ENV DISPLAY=:99
 
+# create and activate a virtual environment
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# set up the working directory
 WORKDIR /app
 
-# Create a non-privileged user that the app will run under.
-# See https://docs.docker.com/go/dockerfile-user-best-practices/
-ARG UID=10001
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    appuser
+# copy and install requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-# Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
-# Leverage a bind mount to requirements.txt to avoid having to copy them into
-# into this layer.
-RUN --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    python -m pip install -r requirements.txt
-
-
-
-RUN apt-get install -y libglib2.0-0 \
-    libnss3 \
-    libnspr4 \
-    libdbus-1-3 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libglib2.0-0 \
-    libcups2 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxfixes3 \
-    libxrandr2 \
-    libgbm1 \
-    libxkbcommon0 \
-    libpango-1.0-0 \
-    libcairo2 \
-    libasound2 
-RUN ldd /usr/local/bin/chromedriver
-RUN ldd /usr/bin/google-chrome
-
-# Switch to the non-privileged user to run the application.
-USER appuser
-
-RUN google-chrome --version
-# Copy the source code into the container.
+# copy the Python test script
 COPY . .
 
-# Expose the port that the application listens on.
+RUN cd tiktok_uploader/tiktok-signature && npm install
+
+
+# ensure correct permissions for /tmp/.X11-unix to prevent Xvfb from issuing warnings
+RUN mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
+
+# change ownership of venv to seluser and switch users
+RUN chown -R seluser:seluser /opt/venv /app
+USER seluser
+
+ENV FLASK_APP=main.py
+# # Expose the port that the application listens on.
 EXPOSE 8000
 
-# Run the application.
-# Run Flask in debug mode
-ENV FLASK_APP=main.py
-# Run the application directly with Python
-CMD ["python", "main.py"]
+# run Xvfb and the Python script
+CMD ["sh", "-c", "Xvfb :99 -ac 2>/dev/null & python3 -u main.py"]
+
+# # Expose the port that the application listens on.
+# EXPOSE 8000
+
+# # Run the application.
+# # Run Flask in debug mode
+# ENV FLASK_APP=main.py
+# # Run the application directly with Python
+# CMD ["python", "main.py"]

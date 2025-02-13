@@ -14,9 +14,11 @@ def ovveride_star_cmd(in_docker=True):
     print('Collecting all files in image directory...')
     image_paths = combine_images.get_image_files()
     combine_images.create_image_video(image_paths) # save to vid dir.
+    users = 'aidanvangessel'
+    title = "Midjourney 2/12/25"
+    video = os.path.join(os.getcwd(), Config.get().videos_dir, 'output_video.mp4')
     
-    args.video = os.path.join(os.getcwd(), Config.get().videos_dir, 'output_video.mp4')
-    tiktok.upload_video(args.users, args.video,  args.title, args.schedule, args.comment, args.duet, args.stitch, args.visibility, args.brandorganic, args.brandcontent, args.ailabel, args.proxy)
+    tiktok.upload_video(users, video, title)
 
 if __name__ == "__main__":
     _ = Config.load("./config.txt")

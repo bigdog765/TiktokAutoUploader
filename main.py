@@ -10,6 +10,7 @@ app = Flask(__name__)
 def hello_world():
     print("Hello World")
     ovveride_star_cmd()
+    return 'Success'
 
 
 if __name__ == "__main__":
