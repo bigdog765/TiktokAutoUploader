@@ -19,6 +19,8 @@ import tempfile
 threads = []
 success_ctr = 0
 amount_of_images = 5
+image_index = amount_of_images
+
 def extract_string_inside_quotes(text):
     # Regex to extract the string inside quotes
     pattern = r'"([^"]+)"'
@@ -33,7 +35,7 @@ def get_scrapeops_url(url):
     proxy_url = 'https://proxy.scrapeops.io/v1/?' + urlencode(payload)
     return proxy_url
 
-def download_image(url):
+def download_image(url, all_urls):
     global success_ctr
     # Extract only the file name from the URL
     file_name = url.split("/")[-1]  # Get the last part of the URL
@@ -64,6 +66,15 @@ def download_image(url):
         success_ctr+=1
     else:
         print(f"Failed to download image. Status code: {response.status_code} {response.reason} {response.text}")
+        # retry image download with a new image url
+        print('Retrying a new image.')
+        retry_image_download(all_urls)
+
+def retry_image_download(all_urls):
+    global image_index
+    image_index +=1
+    download_image(all_urls[image_index],all_urls)
+
 def execute(in_docker=False):
     print('Webscraping started...')
     
@@ -110,7 +121,7 @@ def execute(in_docker=False):
     url_result = [extract_string_inside_quotes(match) for match in matches]
     
     for url in url_result[:amount_of_images]:
-        thr = threading.Thread(target=download_image, args=(url,))
+        thr = threading.Thread(target=download_image, args=(url,url_result,))
         thr.start()
         threads.append(thr)
         time.sleep(2)

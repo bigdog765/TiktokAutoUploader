@@ -5,7 +5,12 @@ from tiktok_uploader.Config import Config
 import sys, os
 import combine_images
 import webscrape.webscrape as webscraper
+import datetime
 
+def get_todays_date():
+    today = datetime.date.today()
+    formatted_date = today.strftime("%B %d, %Y")  # e.g., February 13, 2025
+    return formatted_date
 
 def ovveride_star_cmd(in_docker=True):
     # execute webscraper script to get midjourney images
@@ -15,7 +20,7 @@ def ovveride_star_cmd(in_docker=True):
     image_paths = combine_images.get_image_files()
     combine_images.create_image_video(image_paths) # save to vid dir.
     users = 'aidanvangessel'
-    title = "Midjourney 2/12/25"
+    title = f"Midjourney {get_todays_date()}"
     video = os.path.join(os.getcwd(), Config.get().videos_dir, 'output_video.mp4')
     
     tiktok.upload_video(users, video, title)
