@@ -2,5 +2,10 @@ python cli.py upload --user aidanvangessel -v * -t "My video title"
 gcloud run jobs deploy daily-tiktok-upload --source . --tasks 5 --set-env-vars SLEEP_MS=10000,FAIL_RATE=0.1 --max-retries 2 --region us-central1 --project=dazzling-lodge-448921-n8
 gcloud run deploy --source .
 
-Look into: 
+Run cont:
+docker run -p 8000:8000 --rm -v %cd%:/app i1
+Push image to GCloud:
+gcloud builds submit --region=us-central1 --no-cache --tag us-central1-docker.pkg.dev/dazzling-lodge-448921-n8/cloud-run-source-deploy/tiktokautouploader:tag1
+
+Big help: 
 https://github.com/timoteostewart/dockerized-headfull-chrome-selenium
