@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.keys import Keys
 import os
 import re
 import requests
@@ -112,14 +113,26 @@ def execute(in_docker=False):
     image_elements = driver.find_elements(
         By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')
 
-    # Regex pattern
-    pattern = r'"[^"]*"\)\s*2x\)' # Extract the URL inside the background-image URL with 2x resolution
+    url_result1 = extract_url_data(image_elements)
 
-    background_image_elements = [img.get_attribute("style").split(';')[1] for img in image_elements]
-    matches = [str(re.findall(pattern, elem)) for elem in background_image_elements]
-    # Print the extracted URLs
-    url_result = [extract_string_inside_quotes(match) for match in matches]
+    # scroll down a few pages for more images
+    body = driver.find_element(By.TAG_NAME, "body")
+    body.click()
+    body.send_keys(Keys.PAGE_DOWN)
+    body.send_keys(Keys.PAGE_DOWN)
+    body.send_keys(Keys.PAGE_DOWN)
+    body.send_keys(Keys.PAGE_DOWN)
+    time.sleep(2)
     
+    image_elements_scrolled = driver.find_elements(
+        By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')
+    #print(f"Found {len(image_elements)} images before scrolling.")
+    print(f"Found {len(image_elements_scrolled)} images after scrolling down")
+
+    url_result2 = extract_url_data(image_elements_scrolled)
+    url_result = url_result1 + url_result2
+    random.shuffle(url_result)
+
     for url in url_result[:amount_of_images]:
         thr = threading.Thread(target=download_image, args=(url,url_result,))
         thr.start()
@@ -128,3 +141,22 @@ def execute(in_docker=False):
     [t.join() for t in threads]
     # Quit the driver
     driver.quit()
+
+def extract_url_data(image_elements):
+    desired_images = []
+    for el in image_elements:
+        # Option 1: If the element itself has size information (for background images or divs)
+        size = el.size
+        height = size['height']
+        if height == 550: # aspect ratio of 9:16
+            desired_images.append(el)
+
+    print(f"Found {len(desired_images)} images with the desired aspect ratio")
+    # Regex pattern
+    pattern = r'"[^"]*"\)\s*2x\)' # Extract the URL inside the background-image URL with 2x resolution
+
+    background_image_elements = [img.get_attribute("style").split(';')[1] for img in desired_images]
+    matches = [str(re.findall(pattern, elem)) for elem in background_image_elements]
+    # Print the extracted URLs
+    url_result = [extract_string_inside_quotes(match) for match in matches]
+    return url_result
