@@ -4,8 +4,9 @@ gcloud run deploy --source .
 
 Run cont:
 docker run -p 8000:8000 --rm -v %cd%:/app i1
-Push image to GCloud:
+Push image to Artifact Registry:
 gcloud builds submit --region=us-central1 --no-cache --tag us-central1-docker.pkg.dev/dazzling-lodge-448921-n8/cloud-run-source-deploy/tiktokautouploader:tag1
-
+Update Cloud Run to use latest image:
+gcloud run deploy tiktokautouploader --region=us-central1 --image=us-central1-docker.pkg.dev/dazzling-lodge-448921-n8/cloud-run-source-deploy/tiktokautouploader:tag1
 Big help: 
 https://github.com/timoteostewart/dockerized-headfull-chrome-selenium

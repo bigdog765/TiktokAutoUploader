@@ -51,7 +51,7 @@ def create_image_video(image_paths):
     final_clip = concat_clips.with_audio(audio_clip)
 
     # Save the resulting video
-    final_clip.write_videofile("./VideosDirPath/output_video.mp4", fps=12)
+    final_clip.write_videofile("/tmp/output_video.mp4", fps=12)
     # delete all images in image directory
     remove_images(image_paths)
 
