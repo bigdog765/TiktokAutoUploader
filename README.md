@@ -5,6 +5,7 @@ Fastest Tiktok AutoUploader using Requests, not ~~Selenium~~
 Automatically Uploads to Tiktok with 1 command and within 3 seconds.
 
 Forked version: This forked version webscrapes midjourney.com and auto uploads 5 images to TikTok w/ music.
+
 [Working as of 20th Mar 2025]
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white&style=flat-square)]([https://www.linkedin.com/in/isaac-kogan-5a45b9193/](https://www.linkedin.com/in/michael-p-88b015200/) )
