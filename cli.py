@@ -20,7 +20,7 @@ def ovveride_star_cmd(in_docker=True):
     image_paths = combine_images.get_image_files()
     combine_images.create_image_video(image_paths) # save to vid dir.
     users = 'aidanvangessel'
-    title = f"Midjourney {get_todays_date()}"
+    title = f"Sora {get_todays_date()}"
     video = os.path.join(os.getcwd(), Config.get().videos_dir, 'output_video.mp4')
     
     tiktok.upload_video(users, video, title)

@@ -42,11 +42,12 @@ def download_image(url, all_urls):
     file_name = url.split("/")[-1]  # Get the last part of the URL
 
     random_prefix = secrets.token_hex(4)
-    save_path = os.path.join("./ImagesDirPath", random_prefix + file_name)  # Save directly in ImagesDirPath
+    save_path = os.path.join("./ImagesDirPath", random_prefix + file_name[:25] + '.webp')  # Save directly in ImagesDirPath
 
     # Ensure the ImagesDirPath directory exists
     os.makedirs("./ImagesDirPath", exist_ok=True)
 
+    print(f"Downloading image from {url}")
     url = get_scrapeops_url(url)
     user_agents_list = [
     'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148',
@@ -93,46 +94,50 @@ def execute(in_docker=False):
         service = Service(chrome_driver_path)
         driver = webdriver.Chrome(service=service, options=chrome_options)
     # Load the website
-    driver.get("https://www.midjourney.com/explore?tab=hot")
+    # driver.get("https://www.midjourney.com/explore?tab=hot")
 
-    # Print the page source to verify the element is present
-    #print(driver.page_source) # recaptcha will be present in the page source if ran in headless mode
+    # # Print the page source to verify the element is present
+    # #print(driver.page_source) # recaptcha will be present in the page source if ran in headless mode
 
-    # Increase the wait time
-    wait = WebDriverWait(driver, 10)
+    # # Increase the wait time
+    # wait = WebDriverWait(driver, 10)
 
-    try:
-        print("Waiting for the element to be located")
-        wait.until(EC.presence_of_all_elements_located(
-            (By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')))
-        print("Element found")
-    except Exception as e:
-        print("Element not found")
-        raise e
-    # Extract image URLs (modify the XPath based on the page structure)
-    image_elements = driver.find_elements(
-        By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')
+    # try:
+    #     print("Waiting for the element to be located")
+    #     wait.until(EC.presence_of_all_elements_located(
+    #         (By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')))
+    #     print("Element found")
+    # except Exception as e:
+    #     print("Element not found")
+    #     raise e
+    # # Extract image URLs (modify the XPath based on the page structure)
+    # image_elements = driver.find_elements(
+    #     By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')
 
-    url_result1 = extract_url_data(image_elements)
+    # url_result1 = extract_url_data(image_elements)
 
-    # scroll down a few pages for more images
-    body = driver.find_element(By.TAG_NAME, "body")
-    body.click()
-    body.send_keys(Keys.PAGE_DOWN)
-    body.send_keys(Keys.PAGE_DOWN)
-    body.send_keys(Keys.PAGE_DOWN)
-    body.send_keys(Keys.PAGE_DOWN)
-    time.sleep(2)
+    # # scroll down a few pages for more images
+    # body = driver.find_element(By.TAG_NAME, "body")
+    # body.click()
+    # body.send_keys(Keys.PAGE_DOWN)
+    # body.send_keys(Keys.PAGE_DOWN)
+    # body.send_keys(Keys.PAGE_DOWN)
+    # body.send_keys(Keys.PAGE_DOWN)
+    # time.sleep(2)
     
-    image_elements_scrolled = driver.find_elements(
-        By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')
-    #print(f"Found {len(image_elements)} images before scrolling.")
-    print(f"Found {len(image_elements_scrolled)} images after scrolling down")
+    # image_elements_scrolled = driver.find_elements(
+    #     By.XPATH, '//a[@class="block bg-cover bg-center w-full h-full bg-light-skeleton overflow-hidden dark:bg-dark-skeleton"]')
+    # #print(f"Found {len(image_elements)} images before scrolling.")
+    # print(f"Found {len(image_elements_scrolled)} images after scrolling down")
 
-    url_result2 = extract_url_data(image_elements_scrolled)
-    url_result = url_result1 + url_result2
+    # url_result2 = extract_url_data(image_elements_scrolled)
+    # url_result = url_result1 + url_result2
+    
+    with open("./webscrape/sora_urls.json", "r") as f:
+        import json
+        url_result = json.load(f)["urls"]
+        
     random.shuffle(url_result)
-
     for url in url_result[:amount_of_images]:
         thr = threading.Thread(target=download_image, args=(url,url_result,))
         thr.start()
