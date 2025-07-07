@@ -15,7 +15,7 @@ def get_todays_date():
 def ovveride_star_cmd(in_docker=True):
     # execute webscraper script to get midjourney images
     print('Starting * command...')
-    webscraper.execute(in_docker)
+    #webscraper.execute(in_docker)
     print('Collecting all files in image directory...')
     image_paths = combine_images.get_image_files()
     combine_images.create_image_video(image_paths) # save to vid dir.

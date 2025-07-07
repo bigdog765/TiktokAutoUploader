@@ -13,6 +13,8 @@ def get_image_files():
             print(image_name)
             if not image_name.endswith(".mp4"):
                 image_list.append(os.path.join(os.getcwd(), Config.get().images_dir, image_name))
+        random.shuffle(image_list)
+        image_list = image_list[:5]  # Limit to 5 images
         print('List:', image_list)
         return image_list
         
@@ -44,7 +46,6 @@ def create_image_video(image_paths):
     
     # Load the audio file
     audio_clip = AudioFileClip(sound)
-    # Truncate the audio to match the duration of the video
     audio_clip = audio_clip.subclipped(0, concat_clips.duration)
 
     # Set the audio to the video clip
@@ -53,5 +54,5 @@ def create_image_video(image_paths):
     # Save the resulting video
     final_clip.write_videofile("/tmp/output_video.mp4", fps=12)
     # delete all images in image directory
-    remove_images(image_paths)
+    #remove_images(image_paths)
 
